@@ -1,0 +1,42 @@
+# IDE
+.vscode/
+.idea/
+
+# Models
+lightning_logs/
+mlruns/
+
+# Data
+datasets/
+
+# Testing
+test/resources/out
+.pytest_cache/
+
+# Python
+.venv
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.gz
+*.xdv
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.toc
+
+# Metadata
+*.DS_Store
+*.ipynb_checkpoints
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+/.make/
