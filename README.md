@@ -7,7 +7,7 @@
 [![Conference](https://img.shields.io/badge/Conference-RecSys%202024-4b44ce?style=for-the-badge)](https://recsys.acm.org/recsys24/)
 [![OTTO jobs](https://img.shields.io/badge/otto-jobs-F00020?style=for-the-badge&logo=otto)](https://www.otto.de/jobs/technology/ueberblick/)
 
-**MultiTRON is a session-based transformer capable of computing an efficient approximation of the Pareto front on multi-objective session-based recommendation tasks. This repository contains the official [PyTorch Lightning](https://github.com/Lightning-AI/lightning) implementation for our paper, submitted to ACM RecSys 2024: _Pareto Front Approximation for Multi-Objective Session-Based Recommender Systems_, authored by  [Timo Wilm](https://www.linkedin.com/in/timo-wilm/), [Philipp Normann](https://www.linkedin.com/in/pnormann) and [Felix Stepprath](https://www.linkedin.com/in/felix-stepprath).**
+**MultiTRON is a session-based transformer capable of computing an efficient approximation of the Pareto front on multi-objective session-based recommendation tasks. This repository contains the official [PyTorch Lightning](https://github.com/Lightning-AI/lightning) implementation for our paper, accepted at ACM RecSys 2024: [_Pareto Front Approximation for Multi-Objective Session-Based Recommender Systems_](https://arxiv.org/abs/2407.16828), authored by  [Timo Wilm](https://www.linkedin.com/in/timo-wilm/), [Philipp Normann](https://www.linkedin.com/in/pnormann) and [Felix Stepprath](https://www.linkedin.com/in/felix-stepprath).**
 
 <img src=".readme/header.png" width="100%">
 
