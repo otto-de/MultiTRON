@@ -36,7 +36,11 @@ This work introduces **MultiTRON**, an approach that adapts Pareto front approxi
   </tr>
 </table>
 
+## 🌟 RecSys 2024 Research Showcase
 
+Below is our poster presented at the [18th ACM Conference on Recommender Systems](https://recsys.acm.org/recsys24/) (RecSys 2024), which provides a comprehensive overview of the key concepts, methodologies, and results of our MultiTRON research.
+
+<a href=".readme/poster.pdf"><img src=".readme/poster.svg" width="100%"></a>
 
 ## 🚀 Quick Start
 
