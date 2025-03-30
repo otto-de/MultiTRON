@@ -137,7 +137,7 @@ Here's an explanation of each parameter in the config file:
 
 
 
-### Example Config File for TRON on the OTTO Dataset
+### Example Config File for MultiTRON on the OTTO Dataset
 
 ```json
 {
@@ -184,6 +184,9 @@ If MultiTRON aids your research, please consider citing our work:
 @inproceedings{wilm2024pareto,
   title={Pareto Front Approximation for Multi-Objective Session-Based Recommender Systems},
   author={Wilm, Timo and Normann, Philipp and Stepprath, Felix},
+  booktitle={Proceedings of the 18th ACM Conference on Recommender Systems},
+  doi = {10.1145/3640457.3688048},
+  pages={809--812},
   year={2024}
 }
 ```
