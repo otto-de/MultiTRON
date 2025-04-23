@@ -51,5 +51,6 @@ def validate_batch_per_timestamp(batch, x_hat, output_embedding, cut_offs):
 
     clicks_recall = mean_metric(pw_rec_clicks, batch["mask"])
     orders_recall = mean_metric(pw_rec_orders, batch["order_labels"])
+    order_density = mean_metric(pw_rec_clicks* pw_rec_orders, pw_rec_clicks)
 
-    return clicks_recall, orders_recall
+    return clicks_recall, orders_recall, order_density

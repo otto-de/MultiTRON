@@ -10,7 +10,7 @@ from src.model import MultiTron
 
 def train_multitron(config, data_dir, train_stats, test_stats, num_items):
     checkpoint_callback = ModelCheckpoint(save_top_k=config["max_epochs"],
-                                          monitor='test_loss',
+                                          monitor='val_loss',
                                           mode='min',
                                           filename=f'multitron-{config["dataset"]}-' + '{epoch}-{test_loss:.3f}')
 

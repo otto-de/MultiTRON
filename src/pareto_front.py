@@ -88,6 +88,8 @@ if __name__ == "__main__":
     non_uniformity_loss = [task[0]["test_non_uniformity_loss"] for task in tasks]
     click_recall = [task[0]["test_click_recall"] for task in tasks]
     order_recall = [task[0]["test_order_recall"] for task in tasks]
+    order_density = [task[0]["test_order_density"] for task in tasks]
+    product_recall_od = [task[0]["test_product_recall_od"] for task in tasks]
 
     with open("pareto-front.json", "w") as f:
         f.write(
@@ -98,4 +100,6 @@ if __name__ == "__main__":
                 "non_uniformity_loss": non_uniformity_loss,
                 "click_recall": click_recall,
                 "order_recall": order_recall,
+                "order_density": order_density,
+                "product_recall_od": product_recall_od
             }))

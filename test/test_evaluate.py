@@ -114,8 +114,16 @@ def test_validate_batch_per_timestamp():
     }
     cut_offs = torch.tensor([1, 3]).int()
 
-    clicks_recall, _ = validate_batch_per_timestamp(batch, x_hat, output_embedding, cut_offs)
+    clicks_recall, order_recall, order_density = validate_batch_per_timestamp(batch, x_hat, output_embedding, cut_offs)
 
     assert clicks_recall.shape == torch.Size([2])
     assert torch.greater_equal(clicks_recall, 0).all()
     assert torch.less_equal(clicks_recall, 1).all()
+
+    assert order_recall.shape == torch.Size([2])
+    assert torch.greater_equal(order_recall, 0).all()
+    assert torch.less_equal(order_recall, 1).all()
+    
+    assert order_density.shape == torch.Size([2])
+    assert torch.greater_equal(order_density, 0).all()
+    assert torch.less_equal(order_density, 1).all()

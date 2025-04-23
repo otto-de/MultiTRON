@@ -196,15 +196,17 @@ class MultiTron(pl.LightningModule):
 
         cut_offs = tensor([20], device=self.device)
 
-        click_recall, order_recall = (validate_batch_per_timestamp(batch, x_hat, self.output_embedding, cut_offs))
+        click_recall, order_recall, order_density = (validate_batch_per_timestamp(batch, x_hat, self.output_embedding, cut_offs))
 
-        self.log("test_loss", test_loss)
-        self.log("test_click_loss", click_loss)
-        self.log("test_order_loss", order_loss)
-        self.log("test_seq_len", x_hat.shape[1])
-        self.log("test_click_recall", click_recall)
-        self.log("test_order_recall", order_recall)
-        self.log("test_non_uniformity_loss", non_uniformity_loss)
+        self.log("val_loss", test_loss)
+        self.log("val_click_loss", click_loss)
+        self.log("val_order_loss", order_loss)
+        self.log("val_seq_len", x_hat.shape[1])
+        self.log("val_click_recall", click_recall)
+        self.log("val_order_recall", order_recall)
+        self.log("val_order_density", order_density)
+        self.log("val_product_recall_od", click_recall*order_density)
+        self.log("val_non_uniformity_loss", non_uniformity_loss)
 
     def test_step(self, batch, batch_idx):
         beta = torch.tensor([self.fixed_beta], device=self.device)
@@ -231,7 +233,7 @@ class MultiTron(pl.LightningModule):
 
         cut_offs = tensor([20], device=self.device)
 
-        click_recall, order_recall = (validate_batch_per_timestamp(batch, x_hat, self.output_embedding, cut_offs))
+        click_recall, order_recall, order_density = (validate_batch_per_timestamp(batch, x_hat, self.output_embedding, cut_offs))
 
         self.log("test_loss", test_loss)
         self.log("test_click_loss", click_loss)
@@ -239,6 +241,8 @@ class MultiTron(pl.LightningModule):
         self.log("test_seq_len", x_hat.shape[1])
         self.log("test_click_recall", click_recall)
         self.log("test_order_recall", order_recall)
+        self.log("test_order_density", order_density)
+        self.log("test_product_recall_od", click_recall*order_density)
         self.log("test_non_uniformity_loss", non_uniformity_loss)
 
     def configure_optimizers(self):
