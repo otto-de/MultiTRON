@@ -5,7 +5,7 @@ from torch import concat, diag, logical_and, logical_or, nn, tensor, tile
 from torch.nn import Dropout, Linear
 
 from src.evaluate import validate_batch_per_timestamp
-from src.loss import (approx_epo_loss, calc_click_ssm_order_be_loss, click_ssm_order_be_loss, weighted_loss)
+from src.loss import (approx_epo_loss, calc_loss, click_ssm_order_be_loss, click_ssm_distortion_loss, weighted_loss)
 
 
 class DynamicPositionEmbedding(torch.nn.Module):
@@ -99,8 +99,12 @@ class MultiTron(pl.LightningModule):
         self.loss_fn = loss
         if self.loss_fn == "ssm_and_be":
             self.loss = click_ssm_order_be_loss
+            self.second_loss_prefix = "order"
+        elif self.loss_fn == "ssm_and_distortion":
+            self.loss = click_ssm_distortion_loss
+            self.second_loss_prefix = "distortion"
         else:
-            raise ValueError("MultiTron just supports ssm_and_be as loss function")
+            raise ValueError("MultiTron supports ssm_and_be and ssm_and_distortion as loss functions")
 
         self.sampling_style = sampling_style
         self.topk_sampling = topk_sampling
@@ -147,7 +151,7 @@ class MultiTron(pl.LightningModule):
         beta = torch.distributions.dirichlet.Dirichlet(tensor([self.beta], device=self.device)).sample()
 
         x_hat = self.forward(batch["clicks"], beta, batch["mask"])
-        click_loss, click_elemetwise_loss, order_loss, orders_elementwise_loss = calc_click_ssm_order_be_loss(
+        click_loss, click_elemetwise_loss, second_loss, second_elementwise_loss = calc_loss(
             self.loss,
             x_hat,
             batch["click_labels"],
@@ -163,19 +167,19 @@ class MultiTron(pl.LightningModule):
             self.device,
         )
 
-        non_uniformity_loss = approx_epo_loss(click_elemetwise_loss, orders_elementwise_loss, batch["mask"], beta, self.device)
-        train_loss = weighted_loss(click_loss, order_loss, beta) + self.regularization_penalty * non_uniformity_loss
+        non_uniformity_loss = approx_epo_loss(click_elemetwise_loss, second_elementwise_loss, batch["mask"], beta, self.device)
+        train_loss = weighted_loss(click_loss, second_loss, beta) + self.regularization_penalty * non_uniformity_loss
 
         self.log("train_loss", train_loss)
         self.log("train_click_loss", click_loss)
-        self.log("train_order_loss", order_loss)
+        self.log(f"train_{self.second_loss_prefix}_loss", second_loss)
         self.log("train_non_uniformity_loss", non_uniformity_loss)
         return train_loss
 
     def validation_step(self, batch, _batch_idx):
         beta = torch.distributions.dirichlet.Dirichlet(tensor([self.beta], device=self.device)).sample()
         x_hat = self.forward(batch["clicks"], beta, batch["mask"])
-        click_loss, click_elemetwise_loss, order_loss, orders_elementwise_loss = calc_click_ssm_order_be_loss(
+        click_loss, click_elemetwise_loss, second_loss, second_elementwise_loss = calc_loss(
             self.loss,
             x_hat,
             batch["click_labels"],
@@ -191,8 +195,8 @@ class MultiTron(pl.LightningModule):
             self.device,
         )
 
-        non_uniformity_loss = approx_epo_loss(click_elemetwise_loss, orders_elementwise_loss, batch["mask"], beta, self.device)
-        test_loss = weighted_loss(click_loss, order_loss, beta) + self.regularization_penalty * non_uniformity_loss
+        non_uniformity_loss = approx_epo_loss(click_elemetwise_loss, second_elementwise_loss, batch["mask"], beta, self.device)
+        test_loss = weighted_loss(click_loss, second_loss, beta) + self.regularization_penalty * non_uniformity_loss
 
         cut_offs = tensor([20], device=self.device)
 
@@ -200,7 +204,7 @@ class MultiTron(pl.LightningModule):
 
         self.log("val_loss", test_loss)
         self.log("val_click_loss", click_loss)
-        self.log("val_order_loss", order_loss)
+        self.log(f"val_{self.second_loss_prefix}_loss", second_loss)
         self.log("val_seq_len", x_hat.shape[1])
         self.log("val_click_recall", click_recall)
         self.log("val_order_recall", order_recall)
@@ -212,7 +216,7 @@ class MultiTron(pl.LightningModule):
         beta = torch.tensor([self.fixed_beta], device=self.device)
 
         x_hat = self.forward(batch["clicks"], beta, batch["mask"])
-        click_loss, click_elemetwise_loss, order_loss, orders_elementwise_loss = calc_click_ssm_order_be_loss(
+        click_loss, click_elemetwise_loss, second_loss, second_elementwise_loss = calc_loss(
             self.loss,
             x_hat,
             batch["click_labels"],
@@ -228,8 +232,8 @@ class MultiTron(pl.LightningModule):
             self.device,
         )
 
-        non_uniformity_loss = approx_epo_loss(click_elemetwise_loss, orders_elementwise_loss, batch["mask"], beta, self.device)
-        test_loss = weighted_loss(click_loss, order_loss, beta) + self.regularization_penalty * non_uniformity_loss
+        non_uniformity_loss = approx_epo_loss(click_elemetwise_loss, second_elementwise_loss, batch["mask"], beta, self.device)
+        test_loss = weighted_loss(click_loss, second_loss, beta) + self.regularization_penalty * non_uniformity_loss
 
         cut_offs = tensor([20], device=self.device)
 
@@ -237,7 +241,7 @@ class MultiTron(pl.LightningModule):
 
         self.log("test_loss", test_loss)
         self.log("test_click_loss", click_loss)
-        self.log("test_order_loss", order_loss)
+        self.log(f"test_{self.second_loss_prefix}_loss", second_loss)
         self.log("test_seq_len", x_hat.shape[1])
         self.log("test_click_recall", click_recall)
         self.log("test_order_recall", order_recall)

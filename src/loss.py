@@ -26,25 +26,38 @@ def binary_cross_entropy_loss(pos_logits, labels, mask, device="cpu"):
     return elementwise_binary_ce_loss.sum() / mask.sum(), elementwise_binary_ce_loss.squeeze()
 
 
+def distortion_loss(pos_logits, neg_logits, mask, device="cpu"):
+    logits = cat((pos_logits, neg_logits), dim=-1)
+    targets_shape = logits.shape
+    logits = logits.reshape(-1, targets_shape[-1])
+    targets = 1/targets_shape[-1] * ones(logits.shape, device=device)
+    elementwise_distortion_loss = ce_loss(logits, targets).reshape(targets_shape[0], targets_shape[1]) * mask
+    return sum(elementwise_distortion_loss) / sum(mask), elementwise_distortion_loss
+
 def click_ssm_order_be_loss(pos_logits, neg_logits, order_labels, mask, device="cpu"):
     ssm_click_loss, ssm_click_elementwise_loss = sampled_softmax_loss(pos_logits, neg_logits, mask, device)
     bce_order_loss, bce_elementwise_loss = binary_cross_entropy_loss(pos_logits, order_labels, mask, device)
     return ssm_click_loss, ssm_click_elementwise_loss, bce_order_loss, bce_elementwise_loss
 
+def click_ssm_distortion_loss(pos_logits, neg_logits, _, mask, device="cpu"):
+    ssm_click_loss, ssm_click_elementwise_loss = sampled_softmax_loss(pos_logits, neg_logits, mask, device)
+    dis_loss, dis_elementwise_loss = distortion_loss(pos_logits, neg_logits, mask, device)
+    return ssm_click_loss, ssm_click_elementwise_loss, dis_loss, dis_elementwise_loss
 
-def weighted_loss(click_loss, order_loss, beta):
-    loss_vec = torch.stack([click_loss, order_loss])
+
+def weighted_loss(click_loss, second_loss, beta):
+    loss_vec = torch.stack([click_loss, second_loss])
     return (loss_vec * beta).sum()
 
 
-def cosine_loss(click_elementwise_loss, order_elementwise_loss, mask, beta, device="cpu"):
-    loss_vectors_for_cosine = torch.stack([click_elementwise_loss, order_elementwise_loss], dim=-1)
+def cosine_loss(click_elementwise_loss, second_elementwise_loss, mask, beta, device="cpu"):
+    loss_vectors_for_cosine = torch.stack([click_elementwise_loss, second_elementwise_loss], dim=-1)
     cos_loss = -(cos_sim(beta, loss_vectors_for_cosine) * mask).sum() / mask.sum()
     return cos_loss
 
 
-def approx_epo_loss(click_elementwise_loss, order_elementwise_loss, mask, beta, device="cpu"):
-    elementwise_losses = torch.stack([click_elementwise_loss, order_elementwise_loss], dim=-1)
+def approx_epo_loss(click_elementwise_loss, second_elementwise_loss, mask, beta, device="cpu"):
+    elementwise_losses = torch.stack([click_elementwise_loss, second_elementwise_loss], dim=-1)
     weighted_loss = elementwise_losses * beta
     normalized = (weighted_loss / clip(weighted_loss.sum(-1), 1e-6).unsqueeze(-1)) * mask.unsqueeze(-1)
     res_normalized = normalized.reshape(-1, normalized.shape[2])
@@ -53,7 +66,7 @@ def approx_epo_loss(click_elementwise_loss, order_elementwise_loss, mask, beta, 
     return res
 
 
-def calc_click_ssm_order_be_loss(
+def calc_loss(
     loss_fn,
     x_hat,
     click_labels,

@@ -30,6 +30,11 @@ if __name__ == "__main__":
     with open(f"configs/{args.config_filename}.json", "r") as f:
         config = json.load(f)
 
+    if config["loss"] == "ssm_and_bce":
+        prefix_second = "order"
+    elif config["loss"] == "ssm_and_distortion":
+        prefix_second = "distortion"
+
     number_points = args.number_points  # number_points + 1 is the total number of points
     dataset = config["dataset"]
     if dataset == "diginetica":
@@ -84,7 +89,7 @@ if __name__ == "__main__":
         order_weight.append(beta[1])
 
     click_loss = [task[0]["test_click_loss"] for task in tasks]
-    order_loss = [task[0]["test_order_loss"] for task in tasks]
+    second_loss = [task[0][f"test_{prefix_second}_loss"] for task in tasks]
     non_uniformity_loss = [task[0]["test_non_uniformity_loss"] for task in tasks]
     click_recall = [task[0]["test_click_recall"] for task in tasks]
     order_recall = [task[0]["test_order_recall"] for task in tasks]
@@ -94,9 +99,9 @@ if __name__ == "__main__":
     with open("pareto-front.json", "w") as f:
         f.write(
             json.dumps({
-                "order_weight": order_weight,
+                f"{prefix_second}_weight": order_weight,
                 "click_loss": click_loss,
-                "order_loss": order_loss,
+                f"{prefix_second}_loss": second_loss,
                 "non_uniformity_loss": non_uniformity_loss,
                 "click_recall": click_recall,
                 "order_recall": order_recall,
