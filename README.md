@@ -7,7 +7,8 @@
 [![Conference](https://img.shields.io/badge/Conference-RecSys%202024-4b44ce?style=for-the-badge)](https://recsys.acm.org/recsys24/)
 [![OTTO jobs](https://img.shields.io/badge/otto-jobs-F00020?style=for-the-badge&logo=otto)](https://www.otto.de/jobs/technology/ueberblick/)
 
-**MultiTRON is a session-based transformer capable of computing an efficient approximation of the Pareto front on multi-objective session-based recommendation tasks. This repository contains the official [PyTorch Lightning](https://github.com/Lightning-AI/lightning) implementation for our paper, accepted at ACM RecSys 2024: [_Pareto Front Approximation for Multi-Objective Session-Based Recommender Systems_](https://arxiv.org/abs/2407.16828), authored by  [Timo Wilm](https://www.linkedin.com/in/timo-wilm/), [Philipp Normann](https://www.linkedin.com/in/pnormann) and [Felix Stepprath](https://www.linkedin.com/in/felix-stepprath).**
+**MultiTRON is a session-based transformer capable of computing an efficient approximation of the Pareto front on multi-objective session-based recommendation tasks. This repository contains the official [PyTorch Lightning](https://github.com/Lightning-AI/lightning) implementation for our paper, accepted at ACM RecSys 2024: [_Pareto Front Approximation for Multi-Objective Session-Based Recommender Systems_](https://arxiv.org/abs/2407.16828), authored by  [Timo Wilm](https://www.linkedin.com/in/timo-wilm/), [Philipp Normann](https://www.linkedin.com/in/pnormann) and [Felix Stepprath](https://www.linkedin.com/in/felix-stepprath). Additionally, MultiTRON serves as backbone for our ACM RecSys 2025 contribution:
+Identifying Offline Metrics that Predict Online Impact: A Pragmatic Strategy for Real-World Recommender Systems from  [Timo Wilm](https://www.linkedin.com/in/timo-wilm/) and [Philipp Normann](https://www.linkedin.com/in/pnormann).**
 
 <img src=".readme/header.png" width="100%">
 
@@ -126,7 +127,7 @@ Here's an explanation of each parameter in the config file:
 - `sampling_style`: The style of negative sampling to use (e.g., "eventwise", "sessionwise", "batchwise"). Has significant impact on training speed.
 - `topk_sampling`: If true, top-k negative sampling is enabled.
 - `topk_sampling_k`: If `topk_sampling` is true, this parameter specifies the number of top k negative samples to be used for training.
-- `loss`: The loss function to use (e.g., only ssm_and_be is implemented).
+- `loss`: The loss function to use (e.g. "ssm_and_be" or "ssm_and_distortion" is implemented).
 - `max_epochs`: The maximum number of training epochs.
 - `batch_size`: The batch size used for training and validation.
 - `max_session_length`: The maximum length of a session. Longer sessions will be truncated.
